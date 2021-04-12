@@ -1,5 +1,3 @@
-@Library('javahome-libs') _
-
 pipeline{
     agent any
     options {
