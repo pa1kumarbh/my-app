@@ -1,3 +1,5 @@
+@Library('javahome-libs') _
+
 pipeline{
     agent any
     options {
@@ -33,6 +35,29 @@ pipeline{
         
      
         }
+        
+        }
+        stage("Nexus Deploy"){
+            steps{
+                script{
+                    def pomFile = readMavenPom file: 'pom.xml'
+                    nexusArtifactUploader artifacts: [[artifactId: 'myweb', classifier: '', file: "target/myweb-${pomFile.version}.war", type: 'war']], 
+                                      credentialsId: 'nexus3', 
+                                      groupId: 'in.javahome', 
+                                      nexusUrl: '172.31.71.247:8081', 
+                                      nexusVersion: 'nexus3', 
+                                      protocol: 'http', repository: 'javahome-my-app', 
+                                      version: pomFile.version
+                }
+            }
+        }
+          
+        stage('Tomcat Deploy'){
+            steps{
+                tomcatDeploy("172.31.35.55","ec2-user","myweb")
+            }
+        }
+     
+    }
 }
-}        
 
